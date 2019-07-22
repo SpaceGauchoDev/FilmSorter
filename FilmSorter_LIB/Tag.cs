@@ -29,6 +29,19 @@ namespace FilmSorter_LIB
 
         // PUBLIC METHODS ===============================================================================
         public int GetID() { return mTagID; }
+        public string GetDisplayName() { return mDisplayName; }
+
+        public static Admin.StringBool Validate(Admin.TagData pData)
+        {
+            Admin.StringBool result;
+            result.Txt = "";
+            result.IsSuccess = false;
+
+
+
+            return result;
+        }
+
 
 
         #endregion

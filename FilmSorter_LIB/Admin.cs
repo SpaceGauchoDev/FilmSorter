@@ -183,6 +183,102 @@ namespace FilmSorter_LIB
 
         #region PRIVATE METHODS  
         // PRIVATE METHODS ==============================================================================
+        private void Init()
+        {
+            mFilms = new List<Film>();
+            mFilmMakers = new List<FilmMaker>();
+            mUsers = new List<User>();
+            mTags = new List<Tag>();
+            mPlayLists = new List<PlayList>();
+
+        }
+
+        private StringBool InstanciateTag(TagData pData)
+        {
+            StringBool result;
+            result.Txt = "";
+            result.IsSuccess = true;
+
+            // check for empty data fields
+            if(pData.DisplayName == "" || pData.Description == "")
+            {
+                result.IsSuccess = false;
+                result.Txt = "Error: One or more data fields are empty.";
+                return result;
+            }
+
+            // check for same object already in system
+            if (GetTag(pData.DisplayName) != null)
+            {
+                result.IsSuccess = false;
+                result.Txt = "Error: Tag with the same Display Name already exists in the system.";
+                return result;
+            }
+
+            // validate business rules
+            StringBool validation = Tag.Validate(pData);
+            if (validation.IsSuccess)
+            {
+                // if we reach here, all validations have been satisfied 
+                // and we can instanciate the new object
+                Tag t = new Tag(pData);
+                result.Txt = "New Tag created sucesfully";
+            }
+            else
+            {
+                // busniess rules not met
+                result.IsSuccess = false;
+                result.Txt = validation.Txt;
+            }
+
+            return result;
+        }
+
+        //search by pTagID
+        private Tag GetTag(int pTagID)
+        {
+            Tag t = null;
+            //if the array is initialized and populated
+            if (mTags.Count > 0)
+            {
+                int i = 0;
+                while (t == null && i < mTags.Count)
+                {
+                    if (mTags[i].GetID() == pTagID)
+                    {
+                        t = mTags[i];
+                    }
+                    else
+                    {
+                        i++;
+                    }
+                }
+            }
+            return t;
+        }
+
+        //search by pDisplayName
+        private Tag GetTag(string pDisplayName)
+        {
+            Tag t = null;
+            //if the array is initialized and populated
+            if (mTags.Count > 0)
+            {
+                int i = 0;
+                while (t == null && i < mTags.Count)
+                {
+                    if (mTags[i].GetDisplayName() == pDisplayName)
+                    {
+                        t = mTags[i];
+                    }
+                    else
+                    {
+                        i++;
+                    }
+                }
+            }
+            return t;
+        }
 
 
         #endregion
@@ -192,11 +288,7 @@ namespace FilmSorter_LIB
 
         private Admin()
         {
-            mFilms = new List<Film>();
-            mFilmMakers = new List<FilmMaker>();
-            mUsers = new List<User>();
-            mTags = new List<Tag>();
-            mPlayLists = new List<PlayList>();
+            Init();
         }
         #endregion
 
