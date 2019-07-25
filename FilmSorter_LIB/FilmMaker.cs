@@ -29,13 +29,72 @@ namespace FilmSorter_LIB
 
         // PUBLIC METHODS ===============================================================================
         public int GetID() { return mFilmMakerID; }
+        public string GetFullName() { return mFullName; }
 
+        // we validate business rules for this class of object
+        public static Admin.StringBool Validate(Admin.FilmMakerData pData)
+        {
+            Admin.StringBool result;
+            result.Txt = "Error: ";
+            result.IsSuccess = true;
+
+            // FilmMaker can't die before they are born
+            DateTime unset = new DateTime();
+            if (pData.DOD <= pData.DOB && pData.DOD != unset)
+            {
+                result.Txt += "Film Maker DOD (Date Of Death) can't be earlier than DOB (Date of Birth). ";
+                result.IsSuccess = false;
+            }
+
+            // FullName name cant start or end with a space
+            if (pData.FullName[0] == ' ' || pData.FullName[pData.FullName.Length - 1] == ' ')
+            {
+                result.Txt += "Film Maker Full Name can't start or end with a space. ";
+                result.IsSuccess = false;
+            }
+
+            return result;
+        }
+
+        // we add incoming tags to this object's mTags if it didnt have them already
+        public void AddTags(List<Tag> pTags)
+        {
+            for (int i = 0; i < pTags.Count; i++)
+            {
+                if (HasTag(pTags[i]) == null)
+                {
+                    mTags.Add(pTags[i]);
+                }
+            }
+        }
 
         #endregion
 
         #region PRIVATE METHODS  
         // PRIVATE METHODS ==============================================================================
+        
+        // we look for the supplied tag in this object's mTags list
+        private Tag HasTag(Tag pTag)
+        {
+            Tag t = null;
+            if (mTags.Count > 0)
+            {
+                int i = 0;
+                while (i < mTags.Count && t == null)
+                {
+                    if (mTags[i].GetID() == pTag.GetID())
+                    {
+                        t = mTags[i];
+                    }
+                    else
+                    {
+                        i++;
+                    }
+                }
+            }
 
+            return t;
+        }
 
         #endregion
 

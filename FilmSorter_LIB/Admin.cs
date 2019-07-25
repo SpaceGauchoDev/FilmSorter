@@ -31,7 +31,7 @@ namespace FilmSorter_LIB
         private List<FilmMaker> mFilmMakers;
         private List<Tag> mTags;
         private List<User> mUsers;
-        private List<PlayList> mPlayLists; 
+        private List<PlayList> mPlayLists;
 
 
         #endregion
@@ -39,7 +39,8 @@ namespace FilmSorter_LIB
         #region ENUMS
         // ENUMS=========================================================================================
 
-        public enum Roles {NotSet, Administrator, DataEntry, PlaylistMaker}       
+        public enum ObjectTypes {FilmMaker, Tag, Film, PlayList, User, FileInfo};
+        public enum Roles {NotSet, Administrator, DataEntry, PlaylistMaker};       
         public enum Genders {NotSet, Male, Female, Other};
         public enum StorageDevices {NotSet, Laptop, DesktopPC, LiveActionEHDD, AnimatedEHDD};
         public enum Languages{  NotSet, English, French, Spanish, German, Hindi, Mandarin, Japanese,
@@ -190,9 +191,8 @@ namespace FilmSorter_LIB
             mUsers = new List<User>();
             mTags = new List<Tag>();
             mPlayLists = new List<PlayList>();
-
         }
-
+        // attempt to create and add a new Tag object in the system
         private StringBool InstanciateTag(TagData pData)
         {
             StringBool result;
@@ -234,7 +234,7 @@ namespace FilmSorter_LIB
             return result;
         }
 
-        //search by pTagID
+        //search Tag ID
         private Tag GetTag(int pTagID)
         {
             Tag t = null;
@@ -257,7 +257,7 @@ namespace FilmSorter_LIB
             return t;
         }
 
-        //search by pDisplayName
+        //search Tag by DisplayName
         private Tag GetTag(string pDisplayName)
         {
             Tag t = null;
@@ -279,6 +279,117 @@ namespace FilmSorter_LIB
             }
             return t;
         }
+
+        // add tags to object types that support it
+        private void AddTags(int pId, List<Tag> pTags, ObjectTypes pObjectType)
+        {
+            switch (pObjectType)
+            {
+                case ObjectTypes.FilmMaker:
+                    GetFilmMaker(pId).AddTags(pTags);
+                    break;
+                case ObjectTypes.Film:
+                    break;
+                case ObjectTypes.PlayList:
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        // attempt to create and add a new FilmMaker object in the system
+        private StringBool InstanciateFilmMaker(FilmMakerData pData)
+        {
+            StringBool result;
+            result.Txt = "";
+            result.IsSuccess = true;
+
+            // check for empty data fields
+            // DOB is mandatory for new FilmMaker but DOD can be unset
+            // unset DOD will be interpreted as the FilmMaker still being alive
+            DateTime unset = new DateTime();
+            if (pData.FullName == "" || pData.Gender == Genders.NotSet || pData.DOB == unset)
+            {
+                result.IsSuccess = false;
+                result.Txt = "Error: One or more data fields are empty.";
+                return result;
+            }
+
+            // check for same object already in system
+            if (GetFilmMaker(pData.FullName) != null)
+            {
+                result.IsSuccess = false;
+                result.Txt = "Error: Film Maker with the same Full Name already exists in the system.";
+                return result;
+            }
+
+            // validate business rules
+            StringBool validation = FilmMaker.Validate(pData);
+            if (validation.IsSuccess)
+            {
+                // if we reach here, all validations have been satisfied 
+                // and we can instanciate the new object
+                FilmMaker t = new FilmMaker(pData);
+                result.Txt = "New Film Maker created sucesfully";
+            }
+            else
+            {
+                // busniess rules not met
+                result.IsSuccess = false;
+                result.Txt = validation.Txt;
+            }
+
+            return result;
+        }
+
+
+        //search FilmMaker by ID
+        private FilmMaker GetFilmMaker(int pFilmMakerID)
+        {
+            FilmMaker f = null;
+            //if the array is initialized and populated
+            if (mFilmMakers.Count > 0)
+            {
+                int i = 0;
+                while (f == null && i < mFilmMakers.Count)
+                {
+                    if (mFilmMakers[i].GetID() == pFilmMakerID)
+                    {
+                        f = mFilmMakers[i];
+                    }
+                    else
+                    {
+                        i++;
+                    }
+                }
+            }
+            return f;
+        }
+
+        //search FilmMaker by FullName
+        private FilmMaker GetFilmMaker(string pFullName)
+        {
+            FilmMaker f = null;
+            //if the array is initialized and populated
+            if (mFilmMakers.Count > 0)
+            {
+                int i = 0;
+                while (f == null && i < mFilmMakers.Count)
+                {
+                    if (mFilmMakers[i].GetFullName() == pFullName)
+                    {
+                        f = mFilmMakers[i];
+                    }
+                    else
+                    {
+                        i++;
+                    }
+                }
+            }
+            return f;
+        }
+
+
 
 
         #endregion

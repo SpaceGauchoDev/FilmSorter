@@ -11,6 +11,8 @@ namespace FilmSorter_LIB
         #region CLASS DECLARATIONS   
         // CLASS DECLARATIONS===========================================================================
         private static int mLastID = -1;
+        private static int mMaxChar = 20;
+        private static int mMinChar = 2;
         #endregion
 
         #region MEMBER DECLARATIONS   
@@ -31,13 +33,26 @@ namespace FilmSorter_LIB
         public int GetID() { return mTagID; }
         public string GetDisplayName() { return mDisplayName; }
 
+        // we validate business rules for this class of object
         public static Admin.StringBool Validate(Admin.TagData pData)
         {
             Admin.StringBool result;
-            result.Txt = "";
-            result.IsSuccess = false;
+            result.Txt = "Error: ";
+            result.IsSuccess = true;
 
+            // display name cant start or end with a space
+            if (pData.DisplayName[0] == ' ' || pData.DisplayName[pData.DisplayName.Length - 1] == ' ')
+            {
+                result.Txt += "Tag Display Name can't start or end with a space. ";
+                result.IsSuccess = false;
+            }
 
+            // display name cant be less than mMinChar characters long or more than mMaxChar
+            if (pData.DisplayName.Length < mMinChar || pData.DisplayName.Length > mMaxChar)
+            {
+                result.Txt += "Tag Display Name must be between 2 and 20 characters long. ";
+                result.IsSuccess = false;
+            }
 
             return result;
         }
